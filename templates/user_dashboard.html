@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Crop Health Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        /* Inline CSS for quick styling, you can move to style.css */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 0;
+        }
+        .topbar {
+            background-color: #2e7d32;
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .user-info {
+            font-size: 14px;
+        }
+        .logout-btn {
+            margin-left: 15px;
+            background-color: #c62828;
+            color: white;
+            padding: 5px 10px;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        .main-container {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 20px;
+            gap: 20px;
+        }
+        .form-card, .result-section {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+        }
+        .form-card {
+            flex: 1 1 300px;
+            max-width: 400px;
+        }
+        .result-section {
+            flex: 2 1 600px;
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            background-color: #2e7d32;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #1b5e20;
+        }
+        .result-card {
+            margin-top: 20px;
+            padding: 15px;
+            border-left: 5px solid #2e7d32;
+            background-color: #f1f8e9;
+            border-radius: 8px;
+        }
+        .disease-card { border-color: #c62828; background-color: #ffebee; }
+        .stress-card { border-color: #f9a825; background-color: #fff8e1; }
+        .heatmap-card { border-color: #1565c0; background-color: #e3f2fd; }
+        .image-compare {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .compare-img {
+            width: 100%;
+            max-width: 250px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .chart-btn {
+            display: inline-block;
+            background-color: #1565c0;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+        .chart-btn:hover {
+            background-color: #0d47a1;
+        }
+        .severity-info {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="topbar">
+    <h2>🌿 Smart Crop Health Monitoring</h2>
+    <div class="user-info">
+        Welcome, {{ username }}
+        <a href="/logout" class="logout-btn">Logout</a>
+    </div>
+</div>
+
+<div class="main-container">
+
+    <!-- LEFT SIDE — FORM -->
+    <div class="form-card">
+        <h3>📤 Upload Leaf & Soil Data</h3>
+        <form method="POST" enctype="multipart/form-data">
+            <input type="text" name="plant_name" placeholder="Plant Name" required>
+            <input type="file" name="leaf" required>
+            <input type="number" step="0.1" name="soil" placeholder="Soil Moisture" required>
+            <input type="number" step="0.1" name="hum" placeholder="Humidity" required>
+            <input type="number" step="0.1" name="temp" placeholder="Temperature" required>
+            <input type="number" step="0.1" name="ph" placeholder="Soil pH" required>
+            <button type="submit">🔍 Analyze Plant</button>
+        </form>
+    </div>
+
+    <!-- RIGHT SIDE — RESULTS -->
+    <div class="result-section">
+
+        {% if disease %}
+        <div class="result-card disease-card">
+            <h3>🦠 Disease Detection</h3>
+            <p><b>Disease:</b> {{ disease }}</p>
+            <p><b>📖 About:</b> {{ disease_about }}</p>
+            <p><b>⚠ Cause:</b> {{ disease_cause }}</p>
+            <p><b>🧬 Symptoms</b>{{ disease_symptoms }}</p>
+            <p><b>💊 Treatment:</b> {{ disease_solution }}</p>
+            {% if severity_level %}
+            <p class="severity-info">🌡 Severity Level: {{ severity_level }} ({{ severity_percent | round(2) }}%)</p>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {% if stress %}
+        <div class="result-card stress-card">
+            <h3>🌡 Plant Stress Analysis</h3>
+            <p><b>Stress Level:</b> {{ stress }}</p>
+            <p><b>❓ Reason:</b> {{ stress_reason }}</p>
+            <p><b>✅ Solution:</b> {{ stress_solution }}</p>
+        </div>
+        {% endif %}
+
+        {% if gradcam %}
+        <div class="result-card heatmap-card">
+            <h3>🔥 Affected Leaf Region (Grad-CAM Explanation)</h3>
+            <div class="image-compare">
+                <div>
+                    <p><b>Original Leaf Image</b></p>
+                    <img src="{{ original_img }}" class="compare-img">
+                </div>
+                <div>
+                    <p><b>AI Highlighted Region</b></p>
+                    <img src="{{ gradcam }}" class="compare-img">
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+    
+
+    </div>
+</div>
+
+</body>
+</html>

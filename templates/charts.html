@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Crop Health Analytics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial;
+            background: linear-gradient(to right, #d4fc79, #96e6a1);
+            text-align: center;
+        }
+        .chart-container {
+            width: 80%;
+            margin: 20px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px gray;
+        }
+        .btn {
+            padding: 10px 20px;
+            background: green;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<h2>📊 Crop Health Monitoring Analytics</h2>
+<p>Welcome, {{ username | default("User") }}</p>
+
+<!-- 🌿 Disease Chart -->
+<div class="chart-container">
+    <h3>Disease Frequency</h3>
+    <canvas id="diseaseChart"></canvas>
+</div>
+
+<!-- 🌡 Stress Chart -->
+<div class="chart-container">
+    <h3>Stress Percentage</h3>
+    <canvas id="stressChart"></canvas>
+</div>
+
+<!-- 📅 Timeline Chart -->
+<div class="chart-container">
+    <h3>Plant Health Timeline</h3>
+    <canvas id="healthChart"></canvas>
+</div>
+
+<a href="/admin"><button class="btn">⬅ Back to Dashboard</button></a>
+
+<script>
+    // 🦠 Disease Chart
+    new Chart(document.getElementById('diseaseChart'), {
+        type: 'bar',
+        data: {
+            labels: {{ disease_labels | default([]) | tojson }},
+            datasets: [{
+                label: 'Cases',
+                data: {{ disease_values | default([]) | tojson }},
+                borderWidth: 1
+            }]
+        }
+    });
+
+    // 🌡 Stress Chart
+    new Chart(document.getElementById('stressChart'), {
+        type: 'pie',
+        data: {
+            labels: {{ stress_labels | default(["Healthy","Stress"]) | tojson }},
+            datasets: [{
+                data: {{ stress_values | default([0,0]) | tojson }}
+            }]
+        }
+    });
+
+    // 📅 Timeline Chart
+    new Chart(document.getElementById('healthChart'), {
+        type: 'line',
+        data: {
+            labels: {{ dates | default([]) | tojson }},
+            datasets: [{
+                label: 'Health (1=Healthy, 0=Stress)',
+                data: {{ health | default([]) | tojson }},
+                fill: false,
+                tension: 0.3
+            }]
+        },
+        options: {
+            scales: {
+                y: { min: 0, max: 1 }
+            }
+        }
+    });
+</script>
+
+</body>
+</html>
